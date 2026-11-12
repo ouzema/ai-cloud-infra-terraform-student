@@ -17,7 +17,6 @@ variable "team" {
     error_message = "L'identifiant d'équipe est celui donné par l'enseignant : team1, team-really-cool, team3 ou team-ghv."
   }
 }
-
 variable "image" {
   description = "Image à déployer, avec son tag : europe-west1-docker.pkg.dev/advanced-cloud-ai/cloud-ai/<team>-fraud-api:<tag>."
   type        = string
