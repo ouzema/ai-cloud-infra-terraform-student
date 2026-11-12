@@ -98,6 +98,11 @@ resource "google_cloud_run_v2_service" "api" {
 
   # le conteneur lit le bucket au démarrage : le droit doit exister avant
   depends_on = [google_storage_bucket_iam_member.models_reader]
+
+  lifecycle {
+    # l'image est choisie par le déploiement continu, pas par Terraform
+    ignore_changes = [template[0].containers[0].image]
+  }
 }
 
 resource "google_cloud_run_v2_service_iam_member" "invokers" {
@@ -108,3 +113,4 @@ resource "google_cloud_run_v2_service_iam_member" "invokers" {
   role     = "roles/run.invoker"
   member   = each.value
 }
+
