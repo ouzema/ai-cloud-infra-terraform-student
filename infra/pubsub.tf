@@ -37,7 +37,7 @@ resource "google_pubsub_subscription" "tx" {
   message_retention_duration = "3600s"
 
   push_config {
-    push_endpoint = google_cloud_run_v2_service.api.uri
+    push_endpoint = "${google_cloud_run_v2_service.api.uri}/pubsub"
 
     oidc_token {
       service_account_email = google_service_account.push.email
@@ -54,7 +54,7 @@ resource "google_pubsub_subscription" "tx" {
   # À COMPLÉTER (c) : le bloc dead_letter_policy, à décommenter et compléter.
   # Indice : après 5 tentatives, le message part dans le topic créé en 3 (attribut id).
 dead_letter_policy {
-  dead_letter_topic     = var.tx_topic
+  dead_letter_topic     = google_pubsub_topic.dead.id
   max_delivery_attempts = 5
 }
 
