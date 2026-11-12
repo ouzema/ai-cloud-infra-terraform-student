@@ -12,18 +12,21 @@ env:
   PROJECT_ID: advanced-cloud-ai
   REGION: europe-west1
   SERVICE: team-really-cool-fraud-api
-  IMAGE: europe-west1-docker.pkg.dev/advanced-cloud-ai/cloud-ai/team-really-cool-fraud-api:${{ github.sha }}
+  IMAGE: europe-west1-docker.pkg.dev/advanced-cloud-ai/cloud-ai/team-really-cool-fraud-api:${{ github.sha }} # hash d'un commit de ce dépôt, pas du code applicatif
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # le Dockerfile est dans le dépôt applicatif, pas dans celui-ci
       - uses: actions/checkout@v4
+        with:
+          repository: ouzema/td2-fraud-api-albertschool
 
       - uses: google-github-actions/auth@v2
         with:
-          # pool "github" lu sur le compte -cd ; l'identifiant du provider ("github") est supposé, à confirmer
-          workload_identity_provider: projects/191726065850/locations/global/workloadIdentityPools/github/providers/github
+          # variable du dépôt : projects/191726065850/locations/global/workloadIdentityPools/github/providers/<id donné par l'enseignant>
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: team-really-cool-cd@advanced-cloud-ai.iam.gserviceaccount.com
 
       - uses: google-github-actions/setup-gcloud@v2
