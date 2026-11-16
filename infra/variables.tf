@@ -36,7 +36,7 @@ variable "tx_topic" {
 variable "history_topic" {
   description = "Topic historisé dans BigQuery (séance 4)."
   type        = string
-  default     = "projects/advanced-cloud-ai/topics/ff-replay"
+  default     = "projects/advanced-cloud-ai/topics/ff-tx"
 }
 
 variable "feature_source" {
