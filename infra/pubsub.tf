@@ -53,10 +53,10 @@ resource "google_pubsub_subscription" "tx" {
 
   # À COMPLÉTER (c) : le bloc dead_letter_policy, à décommenter et compléter.
   # Indice : après 5 tentatives, le message part dans le topic créé en 3 (attribut id).
-dead_letter_policy {
-  dead_letter_topic     = google_pubsub_topic.dead.id
-  max_delivery_attempts = 5
-}
+  dead_letter_policy {
+    dead_letter_topic     = google_pubsub_topic.dead.id
+    max_delivery_attempts = 5
+  }
 
   labels = {
     team = var.team
