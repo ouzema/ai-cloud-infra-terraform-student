@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="560" viewBox="0 0 780 560" font-family="Helvetica, Arial, sans-serif">
+<rect width="780" height="560" fill="white"/>
+<text x="95" y="30" font-size="20" font-weight="bold" fill="#202124">Accélération de la recherche Optuna — team-really-cool</text>
+<text x="95" y="51" font-size="13" fill="#5f6368">référence : w1-t1, 1 worker, 1 vCPU, 1 thread · durée utilisée : wall_seconds</text>
+<line x1="95.0" y1="440.0" x2="95.0" y2="72.0" stroke="#e8eaed" stroke-width="1"/>
+<line x1="95.0" y1="440.0" x2="745.0" y2="440.0" stroke="#e8eaed" stroke-width="1"/>
+<text x="95.0" y="460.0" font-size="12" text-anchor="middle" fill="#5f6368">0</text>
+<text x="83.0" y="444.0" font-size="12" text-anchor="end" fill="#5f6368">0</text>
+<line x1="176.2" y1="440.0" x2="176.2" y2="72.0" stroke="#e8eaed" stroke-width="1"/>
+<line x1="95.0" y1="394.0" x2="745.0" y2="394.0" stroke="#e8eaed" stroke-width="1"/>
+<text x="176.2" y="460.0" font-size="12" text-anchor="middle" fill="#5f6368">1</text>
+<text x="83.0" y="398.0" font-size="12" text-anchor="end" fill="#5f6368">1</text>
+<line x1="257.5" y1="440.0" x2="257.5" y2="72.0" stroke="#e8eaed" stroke-width="1"/>
+<line x1="95.0" y1="348.0" x2="745.0" y2="348.0" stroke="#e8eaed" stroke-width="1"/>
+<text x="257.5" y="460.0" font-size="12" text-anchor="middle" fill="#5f6368">2</text>
+<text x="83.0" y="352.0" font-size="12" text-anchor="end" fill="#5f6368">2</text>
+<line x1="338.8" y1="440.0" x2="338.8" y2="72.0" stroke="#e8eaed" stroke-width="1"/>
+<line x1="95.0" y1="302.0" x2="745.0" y2="302.0" stroke="#e8eaed" stroke-width="1"/>
+<text x="338.8" y="460.0" font-size="12" text-anchor="middle" fill="#5f6368">3</text>
+<text x="83.0" y="306.0" font-size="12" text-anchor="end" fill="#5f6368">3</text>
+<line x1="420.0" y1="440.0" x2="420.0" y2="72.0" stroke="#e8eaed" stroke-width="1"/>
+<line x1="95.0" y1="256.0" x2="745.0" y2="256.0" stroke="#e8eaed" stroke-width="1"/>
+<text x="420.0" y="460.0" font-size="12" text-anchor="middle" fill="#5f6368">4</text>
+<text x="83.0" y="260.0" font-size="12" text-anchor="end" fill="#5f6368">4</text>
+<line x1="501.2" y1="440.0" x2="501.2" y2="72.0" stroke="#e8eaed" stroke-width="1"/>
+<line x1="95.0" y1="210.0" x2="745.0" y2="210.0" stroke="#e8eaed" stroke-width="1"/>
+<text x="501.2" y="460.0" font-size="12" text-anchor="middle" fill="#5f6368">5</text>
+<text x="83.0" y="214.0" font-size="12" text-anchor="end" fill="#5f6368">5</text>
+<line x1="582.5" y1="440.0" x2="582.5" y2="72.0" stroke="#e8eaed" stroke-width="1"/>
+<line x1="95.0" y1="164.0" x2="745.0" y2="164.0" stroke="#e8eaed" stroke-width="1"/>
+<text x="582.5" y="460.0" font-size="12" text-anchor="middle" fill="#5f6368">6</text>
+<text x="83.0" y="168.0" font-size="12" text-anchor="end" fill="#5f6368">6</text>
+<line x1="663.8" y1="440.0" x2="663.8" y2="72.0" stroke="#e8eaed" stroke-width="1"/>
+<line x1="95.0" y1="118.0" x2="745.0" y2="118.0" stroke="#e8eaed" stroke-width="1"/>
+<text x="663.8" y="460.0" font-size="12" text-anchor="middle" fill="#5f6368">7</text>
+<text x="83.0" y="122.0" font-size="12" text-anchor="end" fill="#5f6368">7</text>
+<line x1="745.0" y1="440.0" x2="745.0" y2="72.0" stroke="#e8eaed" stroke-width="1"/>
+<line x1="95.0" y1="72.0" x2="745.0" y2="72.0" stroke="#e8eaed" stroke-width="1"/>
+<text x="745.0" y="460.0" font-size="12" text-anchor="middle" fill="#5f6368">8</text>
+<text x="83.0" y="76.0" font-size="12" text-anchor="end" fill="#5f6368">8</text>
+<line x1="95.0" y1="440.0" x2="745.0" y2="440.0" stroke="#202124" stroke-width="1.5"/>
+<line x1="95.0" y1="440.0" x2="95.0" y2="72.0" stroke="#202124" stroke-width="1.5"/>
+<polyline points="95.0,440.0 176.2,394.0 257.5,348.0 338.8,302.0 420.0,256.0 501.2,210.0 582.5,164.0 663.8,118.0 745.0,72.0" fill="none" stroke="#9aa0a6" stroke-width="2" stroke-dasharray="7 6"/>
+<polyline points="176.2,394.0 420.0,265.6 745.0,141.6" fill="none" stroke="#1a73e8" stroke-width="3"/>
+<circle cx="176.2" cy="394.0" r="5" fill="#1a73e8"/>
+<circle cx="420.0" cy="265.6" r="5" fill="#1a73e8"/>
+<circle cx="745.0" cy="141.6" r="5" fill="#1a73e8"/><polyline points="176.2,394.0 420.0,282.7 745.0,175.2" fill="none" stroke="#e8710a" stroke-width="3"/>
+<rect x="171.2" y="389.0" width="10" height="10" fill="#e8710a"/>
+<rect x="415.0" y="277.7" width="10" height="10" fill="#e8710a"/>
+<rect x="740.0" y="170.2" width="10" height="10" fill="#e8710a"/><path d="M 420.0 100.0 L 427.0 107.0 L 420.0 114.0 L 413.0 107.0 Z" fill="none" stroke="#188038" stroke-width="2.5"/><text x="184.2" y="384.0" font-size="13" fill="#1a73e8">1,00×</text>
+<text x="428.0" y="255.6" font-size="13" fill="#1a73e8">3,79×</text>
+<text x="737.0" y="131.6" font-size="13" text-anchor="end" fill="#1a73e8">6,49×</text>
+<text x="184.2" y="412.0" font-size="13" fill="#e8710a">1,00×</text>
+<text x="428.0" y="300.7" font-size="13" fill="#e8710a">3,42×</text>
+<text x="737.0" y="193.2" font-size="13" text-anchor="end" fill="#e8710a">5,76×</text>
+<text x="432.0" y="95.0" font-size="13" fill="#188038">7,24×</text>
+<text x="735.0" y="96.0" font-size="13" text-anchor="end" fill="#5f6368">idéal y = n</text>
+<text x="420.0" y="492.0" font-size="14" text-anchor="middle" fill="#3c4043">Workers (tâches parallèles)</text>
+<text transform="translate(28,256.0) rotate(-90)" font-size="14" text-anchor="middle" fill="#3c4043">Accélération (×)</text>
+<line x1="470" y1="300" x2="500" y2="300" stroke="#9aa0a6" stroke-width="2" stroke-dasharray="6 4"/><text x="510" y="304" font-size="13" fill="#202124">idéal y = n</text>
+<line x1="470" y1="324" x2="500" y2="324" stroke="#1a73e8" stroke-width="3"/><text x="510" y="328" font-size="13" fill="#202124">wall_seconds</text>
+<line x1="470" y1="348" x2="500" y2="348" stroke="#e8710a" stroke-width="3"/><text x="510" y="352" font-size="13" fill="#202124">durée d'exécution</text>
+<path d="M 485 366 L 491 372 L 485 378 L 479 372 Z" fill="none" stroke="#188038" stroke-width="2.5"/><text x="510" y="376" font-size="13" fill="#202124">w4-t4 (4 vCPU/tâche)</text>
+<text x="95" y="528" font-size="12" fill="#5f6368">Point vert : même nombre de workers, mais 4 vCPU et 4 threads par tâche ; sa référence reste 1 worker à 1 vCPU.</text>
+<text x="95" y="547" font-size="12" fill="#5f6368">Accélération = durée de w1-t1 / durée de la configuration. Mesures team-really-cool, 18/11/2026.</text>
+</svg>
