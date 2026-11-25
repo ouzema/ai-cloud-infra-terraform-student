@@ -24,7 +24,7 @@ measurements and the release incident.
 | 10 | Session 6 incident | `next-1125145911` (`FEATURE_READER=direct`) p95 648.1 ms vs candidate 2.3 ms, 3 client timeouts; rolled back; alert corrected |
 | 11 | Session 6 report | `mesures.md`, `post-mortem.md`, `checklist.md` filled; shadow a posteriori, degraded allow/block, restore drill, retraining policy |
 | 12 | Reports | Session 2, 3, 4 reports filled with measured values |
-| 13 | Session 7 | Not started — new GPU/LLM lab |
+| 13 | Session 7 | Done — 4-bit Qwen, 358.8 tok/s, 87.0 % score, GPU $25.12/day vs API $31.20/day; service destroyed |
 
 ---
 
@@ -334,6 +334,25 @@ The readiness checklist is filled with the truth: **Validated** no (validation d
 | Session 4 `check.sql` | 0 / 0 |
 | Session 4 reference customer | 5 / 100.79 |
 | Session 6 rollback | candidate 100 %, p95 3.0 ms, no `next` logs |
+| Session 7 LLM | 4-bit Qwen 7B on L4; cold start 281 s; TTFT 152 ms at 200 tokens; 358.8 tok/s at 16 concurrent; eval 87.0 % both 4/8-bit; GPU service destroyed |
+
+---
+
+## 12b. Session 7 — LLM on GPU
+
+Deployed `team-really-cool-llm` (Cloud Run, 1 × NVIDIA L4, 4 vCPU, 16 GiB, 16 slots) from
+`docs/seance-7/llm/`. Terraform creation: **281 s**; first warm request 1.06 s, second 0.74 s.
+
+- Step 1: TTFT **152 ms** at 200 tokens, **564–576 ms** at 1 500; ~51 tokens/s per request; the
+  duration formula checks within 1.5 %.
+- Step 2: **50.0 / 149.4 / 185.3 / 358.8 / 362.5 tokens/s** at 1 / 4 / 8 / 16 / 32 concurrent;
+  saturation at **16** (32 adds 1 % and raises TTFT to 5.5–10.2 s). `/slots`: 8/16 busy, `n_ctx` 2 048.
+- Step 3: GPU **25.12 $/day** vs API **31.20 $/day** with the measured 584/73 tokens; break-even
+  **70 218 alerts/day**; required output 151.4 tok/s < 358.8 measured, so one L4 suffices.
+- Step 4: trace `315e8a2bfbbc95468fda3c2d09e317da`: `chat` 1 629.5 ms, 584→73 tokens;
+  `load_context` 0.4 ms; validation 0.0 ms; `trace.png` written; script instrumented.
+- Step 5: 4-bit **87.0 %**, 8-bit **87.0 %**; 8-bit 65.7 s vs 27.6 s and 8.89 vs 5.96 GiB. Rule
+  (gain ≥ 5 points, loss ≤ 30 %) keeps **4-bit**. GPU service destroyed.
 
 ---
 
@@ -381,8 +400,8 @@ The readiness checklist is filled with the truth: **Validated** no (validation d
    100 % degraded / 100 % alerts, choice `allow`; policy in `docs/seance-6/retraining-policy.md`.
 5. **Restore drill** is done: model artifact restored, feature tables time-travel restored
    (903 359 / 119 640 rows), decision log restored and cleaned up.
-6. **Session 7** is new work: read `docs/seance-7.md` and follow the GPU/LLM lab. It is not a gap in
-   the Session 2–6 hand-in.
+6. **Session 7 is done** (see §12b); the GPU service was destroyed. The only remaining nuance is the
+   pre-promotion shadow comparison in item 2, which is honestly marked “partiel”.
 
 ## 15. Caveats
 

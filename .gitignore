@@ -5,3 +5,6 @@
 crash.log
 .DS_Store
 terraform.tfvars
+
+__pycache__/
+*.pyc
