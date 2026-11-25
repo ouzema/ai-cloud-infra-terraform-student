@@ -1,7 +1,7 @@
 # Mesures séance 7 — groupe : team-really-cool
 
 Région attribuée : `europe-west1` ; rôles pour cette étape (manipulation, mesure, analyse) : rôles
-tournants de l'équipe, à compléter avec les noms.
+tournants de l'équipe (noms non consignés).
 
 ## Servir (étape 0)
 
