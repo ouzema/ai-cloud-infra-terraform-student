@@ -1,12 +1,12 @@
-# Checklist de préparation opérationnelle — team1
+# Checklist de préparation opérationnelle — team-really-cool
 
 Une ligne sans preuve est un non. Un non est une réponse recevable : écrivez alors ce qui manque.
 
 | Ligne | Question | Oui / non | Preuve | Ce qui manque |
 | --- | --- | --- | --- | --- |
-| Validated | Le modèle a-t-il été validé avant de recevoir du trafic, sur des segments et en ombre ? | ... | verdict de `validation.txt`, segment le plus faible, désaccord et écart d'alertes en ombre : ... | ... |
-| Reversible | Peut-on revenir en arrière par une commande écrite d'avance, et l'a-t-on vérifié par la mesure ? | ... | critères horodatés, tableau des paliers, ligne « retour » de `mesures.md` : ... | ... |
-| Observed | Voit-on, par révision, les signaux qui disent que le service va mal ? | ... | référence de l'étape 0, objectif de service, signal qui a détecté la panne : ... | ... |
-| Degradable | Sait-on ce que fait le service quand la lecture de ses features échoue, et l'a-t-on choisi ? | ... | repli observé (`dégradés`, `alertes`) et politique retenue, ou ce qui manque pour en décider : ... | ... |
-| Restorable | Peut-on reconstruire le service à l'identique (modèle, agrégats, configuration) ? | ... | `plan.txt` et les fichiers Terraform (`infra/release.tf`, `infra/scorer/`) : ... | ... |
-| Owned | Chaque élément a-t-il un responsable et une politique de réentraînement ? | ... | politique retenue et un responsable par ligne : ... | ... |
+| Validated | Le modèle a-t-il été validé avant de recevoir du trafic, sur des segments et en ombre ? | **non** (validation seule) | `validation.txt` : contrat `ok`, AP 0,8473 → 0,8854, écart +0,0381 [0,0333 ; 0,0429], six segments concluants ; `mesures.md` section Validation | l'ombre n'a pas été exécutée : pas de deuxième abonnement `team-really-cool-shadow`, pas de comparaison en ombre sur le flux réel |
+| Reversible | Peut-on revenir en arrière par une commande écrite d'avance, et l'a-t-on vérifié par la mesure ? | **oui** | critères horodatés dans `mesures.md` ; test `next` à 10 % : p95 564,1 ms contre 3,1 ms ; retour `candidate=100` à 00:00:30 ; p95 revenue à 3,0 ms ; `mesures.md` lignes Panne et Retour | — |
+| Observed | Voit-on, par révision, les signaux qui disent que le service va mal ? | **oui** | référence p95 3,4 ms, erreurs 0 %, alertes 11,3 % ; SLO p95 ≤ 20 ms ; l'incident a été détecté par la p95 par révision (`measure.py`, logs `features_ms`) ; tableau de bord TD6 | l'âge du plus ancien message n'a pas été relevé sur la fenêtre de référence |
+| Degradable | Sait-on ce que fait le service quand la lecture de ses features échoue, et l'a-t-on choisi ? | **non** | l'incident `next` n'a produit ni `degraded` ni erreur : il ne teste pas le mode dégradé | exécuter `release.sh team-really-cool degrade - <variable> DEGRADED_POLICY=allow`, puis `block`, en ombre, et comparer `dégradés` et `alertes` |
+| Restorable | Peut-on reconstruire le service à l'identique (modèle, agrégats, configuration) ? | **oui (partiel)** | `docs/seance-6/plan.txt` : `1 to import, 0 to add, 0 to change, 0 to destroy` ; `infra/scorer/scorer.tf`, `infra/scorer/main.tf`, `infra/release.tf` ; version 2 du registre (`default`, `challenger`, `champion`) ; `customer_daily` et `terminal_daily` dans BigQuery | le drill de restauration du modèle, des tables de features et du journal de décisions n'a pas été exécuté ; `plan.txt` note que `template.revision` (`next`) n'est pas la révision qui sert (`candidate`) |
+| Owned | Chaque élément a-t-il un responsable et une politique de réentraînement ? | **non** | aucune politique écrite ; le modèle champion est la version 2 | choisir et écrire une politique (calendrier, dérive ou performance) avec un responsable par ligne ; la vérifier sur les labels de fraude qui arrivent avec retard |
