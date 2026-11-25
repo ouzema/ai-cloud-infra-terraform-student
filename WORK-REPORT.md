@@ -404,7 +404,8 @@ Deployed `team-really-cool-llm` (Cloud Run, 1 × NVIDIA L4, 4 vCPU, 16 GiB, 16 s
 5. **Restore drill** is done: model artifact restored, feature tables time-travel restored
    (903 359 / 119 640 rows), decision log restored and cleaned up.
 6. **Session 7 is done** (see §12b); the GPU service was destroyed. All six checklist lines are
-   **oui**; the course work is complete.
+   **oui**. The only number not sourced is the teacher's DDP demo (two throughputs and two APs),
+   marked “non relevé” in `docs/seance-5/compte-rendu.md`.
 
 ## 15. Caveats
 
@@ -418,3 +419,5 @@ Deployed `team-really-cool-llm` (Cloud Run, 1 × NVIDIA L4, 4 vCPU, 16 GiB, 16 s
   not representative; the p95 and errors are valid.
 - The Terraform plan was run with `-refresh=false`; a refreshed plan may show drift on the live
   service, especially the image (ignored by `lifecycle`) and the invoker list.
+- The DDP demo throughputs and validation APs were not recorded during the teacher demonstration;
+  they are marked “non relevé” in the Session 5 report. Every other measurement is sourced.
