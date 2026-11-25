@@ -35,7 +35,7 @@ resource "google_cloud_run_v2_service" "scorer" {
     health_check_disabled            = false
     labels                           = {}
     max_instance_request_concurrency = 4
-    revision                         = "team-really-cool-scorer-next-1125145911"
+    revision                         = "team-really-cool-scorer-cleanup-1125153621"
     service_account                  = "team-really-cool-scorer@advanced-cloud-ai.iam.gserviceaccount.com"
     session_affinity                 = false
     timeout                          = "300s"
@@ -58,7 +58,7 @@ resource "google_cloud_run_v2_service" "scorer" {
       }
       env {
         name  = "FEATURE_READER"
-        value = "direct"
+        value = "snapshot"
       }
       env {
         name  = "FEATURE_SOURCE"

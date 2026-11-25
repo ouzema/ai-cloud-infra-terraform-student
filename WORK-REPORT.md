@@ -280,7 +280,7 @@ are `3263319564977208`, `2947552228922773` and `0553287702820053`.
 - `docs/seance-6/plan.txt`: `1 to import, 0 to add, 0 to change, 0 to destroy`, creator/last_modifier
   masked.
 - The plan confirms the handout's warning: `template.revision` is
-  `team-really-cool-scorer-next-1125145911` (latest created), while 100 % of traffic is on
+  `team-really-cool-scorer-cleanup-1125153621` (latest created, same config as candidate), while 100 % of traffic is on
   `team-really-cool-scorer-candidate-1119194145`. The first two lines of `plan.txt` record it.
 - `infra/release.tf`: shadow subscription `count = shadow_tag == "" ? 0 : 1`; alert policy applied
   and enabled.
