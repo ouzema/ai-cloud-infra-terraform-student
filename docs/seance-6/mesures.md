@@ -67,6 +67,11 @@ Borne d'alertes fixée après l'ombre (étape 2) : l'ombre n'a pas été exécut
 borne de repli retenue : 5,7 % à 17,0 % ; heure : 17:30 UTC. Écart d'alertes mesuré en validation :
 −0,4 point (13,43 % contre 13,83 %).
 
+L'alerte appliquée dans `infra/release.tf` surveille la p95 Cloud Run > 50 ms pendant 60 s, par
+révision. Le seuil est au-dessus du seuil de retour arrière (20 ms) pour absorber un cold start isolé ;
+il déclenche sur la régression de `next` (564 ms), que l'ancienne alerte sur `td6_failed` n'aurait pas
+vue.
+
 Durée d'observation par palier : 5 min après la fin de la commande de changement de trafic ; mesurer
 sur les 5 dernières minutes pour isoler le palier. Six minutes au maximum pour que les trois paliers
 tiennent dans les 25 minutes de l'étape 3.
