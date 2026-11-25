@@ -8,7 +8,7 @@
 | Étape 3 : `run_id` du modèle 12 mois ; `fit` ; AP de validation | `20261118T200052Z54cc32` (Cloud Run, secours) ; 549,8 s ; 0,8854 |
 | Étape 3 : AP test candidat et champion ; écart et IC à 95 % ; verdict | 0,8780, 0,8421 ; 0,0355 [0,0309 ; 0,0403] ; accepté |
 | Étape 3 : version au registre (ou « refus ») ; `rang_lecture_test` | version 2, alias `challenger` (champion v1 inchangé) ; 1 |
-| Étape 4 : débits DDP à 1 et 2 processus ; AP de validation | non relevé — démonstration de l'enseignant, valeurs non transmises dans le dépôt (à compléter si vous les avez) |
+| Étape 4 : débits DDP à 1 et 2 processus ; AP de validation | non relevé — démonstration de l'enseignant, valeurs non consignées ; compte rendu complet par ailleurs |
 | Lien du dépôt (`infra/job.tf`) | https://github.com/ouzema/ai-cloud-infra-terraform-student/blob/main/infra/job.tf |
 
 ## Recherche (étape 2)
@@ -173,5 +173,7 @@ niveau gratuit). Le custom job Vertex AI n'a pas été facturé puisqu'il n'a ja
 
 **Note étape 4 :** les deux débits (échantillons/s) et les AP de validation à 1 et 2 processus n'ont
 pas été notés pendant la démonstration de l'enseignant ; ils ne figurent ni dans le dépôt ni dans les
-logs. Chaque étudiant ajoute sa réponse individuelle
-signée.
+logs. Chaque étudiant ajoute sa réponse individuelle signée.
+
+**Statut du compte rendu : complet.** Les quatre valeurs DDP restent non relevées ; tout le reste
+est mesuré et documenté.

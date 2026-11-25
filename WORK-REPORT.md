@@ -1,8 +1,9 @@
 # Advanced Cloud AI Infrastructure — Work Report
 
 **Date:** 2026-11-25
-**Scope:** TD1, TD2, and Sessions 2–6 of the Terraform repo. Local fixes first, then the cloud
-measurements and the release incident.
+**Status: complete.**
+**Scope:** TD1, TD2, and Sessions 2–7 of the Terraform repo. Local fixes first, then the cloud
+measurements, the release incident, and the LLM lab.
 **Repositories:** `td1-scoring-albertschool`, `td2-fraud-api-albertschool`,
 `ai-cloud-infra-terraform-student`.
 
@@ -388,24 +389,17 @@ Deployed `team-really-cool-llm` (Cloud Run, 1 × NVIDIA L4, 4 vCPU, 16 GiB, 16 s
 
 ---
 
-## 14. What remains
+## 14. Completion status
 
-1. **Review the Terraform plan** before any apply. The Terraform changes are committed as
-   `09acf12` (plus the docs notes `7890318` and `0e97a26`). The destroy is the old `ymeurou` invoker
-   if `tfvars` lists only `maribi`; add both if it is a teammate.
-2. **Session 6 shadow** was done during the course on 19/11 (18:50–18:59): 5 000 messages per
-   revision, 4 478 common transactions, **7.9 % disagreement**, **+4.0 points** alert gap, p95
-   2.4 ms (candidate) vs 3.2 ms (champion), 0 % errors. The checklist line `Validated` is **oui**.
-   The later 25/11 smoke test (20 messages, 20 × 204, p50 1.7 / p95 1.9) only confirmed the path.
-3. **Session 4D (KYC/Qdrant)** is done and the Qdrant service is already deleted; the KYC tables
-   and the three clients are in `docs/seance-4/compte-rendu.md`.
-4. **Degraded mode and retraining policy** are done: `allow` 100 % degraded / 0 % alerts, `block`
-   100 % degraded / 100 % alerts, choice `allow`; policy in `docs/seance-6/retraining-policy.md`.
-5. **Restore drill** is done: model artifact restored, feature tables time-travel restored
-   (903 359 / 119 640 rows), decision log restored and cleaned up.
-6. **Session 7 is done** (see §12b); the GPU service was destroyed. All six checklist lines are
-   **oui**. The only number not sourced is the teacher's DDP demo (two throughputs and two APs),
-   marked “non relevé” in `docs/seance-5/compte-rendu.md`.
+**Status: complete.** All required deliverables for TD1 and Sessions 2–7 are filled, committed and
+pushed. The readiness checklist is **6/6 oui**.
+
+- The only value not sourced is the teacher's DDP demo (two throughputs and two validation APs). It
+  is marked **“non relevé”** in `docs/seance-5/compte-rendu.md`, not invented; the rest of that report
+  is measured.
+- Optional, not part of the hand-in: review the Terraform plan before any future apply. It still
+  contains the Session 5 job, the vectors service and the old invoker swap; nothing needs to be
+  applied for the course.
 
 ## 15. Caveats
 
