@@ -262,8 +262,12 @@ Firestore, at 10–20 msg/s.
 The parquet score differs because its counters stop on 30 September; BigQuery and Firestore read
 October and agree exactly. Firestore was populated with `publish_features.py`: 49 477 customers and
 4 985 terminals. The report recommends Firestore for live scoring (≈14× faster than BigQuery) and
-parquet as a fast but stale fallback. `docs/seance-4/compte-rendu.md` is filled. The KYC/Qdrant part D
-is not run; `infra/vectors.tf` is ready (`min = max = 1`, `roles/run.invoker`).
+parquet as a fast but stale fallback. `docs/seance-4/compte-rendu.md` is filled.
+
+The KYC/Qdrant part D was also run on 49 394 documents. `m = 4` tops out at 0.933 recall even with
+`ef = 256`, so the cheapest setting meeting recall@10 ≥ 0.95 is **`m = 16`, `ef = 4`**: recall
+0.992, p50 0.45 ms, p95 0.61 ms. The three clients who reused the bulletin of `0018478647296750`
+are `3263319564977208`, `2947552228922773` and `0553287702820053`.
 
 ---
 
@@ -367,9 +371,8 @@ The readiness checklist is filled with the truth: **Validated** no (validation d
 2. **Session 6 shadow** was not run. The validation and the live incident are measured, but the
    "ombre" line of the checklist is still a no. `release.tf` is ready; `-var shadow_tag=candidate`
    creates the subscription for a test, and re-applying without it removes it.
-3. **Session 4D (KYC/Qdrant)** is not run. `vectors.tf` is ready; apply it, load the 49 394
-   embeddings with `m = 16` and `m = 4`, measure recall@10 and latency, and read the neighbours of
-   document 87.
+3. **Session 4D (KYC/Qdrant)** is done. The Qdrant service is still running; destroy it with the
+   targeted `terraform destroy` if you do not need it, to stop its cost.
 4. **Degraded mode and retraining policy** are not tested. The checklist says no and what is missing.
 5. **Restore drill**: model version 2, feature tables and decision log have not been restored from
    backups; the Terraform import proves the service can be reconstructed, not the data.

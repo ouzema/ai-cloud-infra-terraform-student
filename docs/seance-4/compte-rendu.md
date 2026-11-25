@@ -74,9 +74,49 @@ curl -s -X POST $URL/predict -H "Authorization: Bearer $TOKEN" \
 
 ## D. Justificatifs KYC (extension)
 
-Non mesuré dans cette reprise : le service `team-really-cool-vectors` n'est pas déployé. Le fichier
-`infra/vectors.tf` est prêt (`min = max = 1`, `roles/run.invoker`) ; il reste à l'appliquer, puis à
-lancer `kyc_vectors.py load --m 16`, `measure`, `load --m 4`, `measure` et `neighbours --doc-id 87`.
+Service `team-really-cool-vectors` (Qdrant), 49 394 documents, 384 dimensions. Les deux index ont été
+reconstruits et mesurés sur 300 requêtes, 10 voisins.
+
+### `m = 16`
+
+| `ef` | rappel@10 | p50 (ms) | p95 (ms) |
+| --- | --- | --- | --- |
+| exact | 1,000 | 10,29 | 13,86 |
+| 4 | 0,992 | 0,45 | 0,61 |
+| 8 | 0,992 | 0,48 | 1,00 |
+| 16 | 0,996 | 0,54 | 1,22 |
+| 32 | 0,996 | 0,61 | 1,15 |
+| 64 | 0,999 | 0,78 | 1,69 |
+| 128 | 1,000 | 0,94 | 1,29 |
+| 256 | 1,000 | 1,43 | 3,62 |
+
+### `m = 4`
+
+| `ef` | rappel@10 | p50 (ms) | p95 (ms) |
+| --- | --- | --- | --- |
+| exact | 1,000 | 10,59 | 14,08 |
+| 4 | 0,669 | 0,39 | 0,81 |
+| 8 | 0,669 | 0,38 | 0,56 |
+| 16 | 0,704 | 0,40 | 0,57 |
+| 32 | 0,751 | 0,49 | 0,95 |
+| 64 | 0,816 | 0,61 | 1,13 |
+| 128 | 0,874 | 0,74 | 1,16 |
+| 256 | 0,933 | 0,98 | 1,63 |
+
+| Choix | Valeur |
+| --- | --- |
+| Réglage retenu (`m`, `ef`) | `m` = 16 , `ef` = 4 |
+| Rappel@10 au réglage retenu | 0,992 |
+| p50 / p95 au réglage retenu | 0,45 ms / 0,61 ms |
+| Clients ayant présenté le même document que `0018478647296750` | `3263319564977208`, `2947552228922773`, `0553287702820053` |
+
+`m = 4` plafonne à 0,933 même avec `ef = 256` : il ne tient pas l'objectif de 0,95. `m = 16` avec
+`ef = 4` est donc le réglage le moins coûteux qui le tient, avec 0,992 de rappel et 0,45 ms de p50.
+
+Le document 87 est le bulletin de paie de Jules Laurent (Énergie du Sud, 19/09/2026, 59 rue de la
+République, Toulouse). Les trois clients qui ont présenté le même document sont
+`3263319564977208` (0,9997), `2947552228922773` (0,9996) et `0553287702820053` (0,9990) ; les deux
+suivants (0,982/0,980) sont des documents différents (Camille et Noah Laurent).
 
 ## Conclusion
 
