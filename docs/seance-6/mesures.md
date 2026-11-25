@@ -10,7 +10,7 @@
 | Latence p95 Cloud Run (`request_latencies`, tableau de bord) | ≈ 10 ms sur la capture ; à confirmer sur une fenêtre de 10 min |
 | Taux d'erreur (`erreurs`) | 0,0 % |
 | Taux d'alerte (`alertes`) | 11,3 % |
-| Âge du plus ancien message non acquitté (tableau de bord) | non relevé sur la capture ; à lire dans le tableau de bord |
+| Âge du plus ancien message non acquitté (tableau de bord) | 8 s max sur 18:30–19:30 (métrique `oldest_unacked_message_age`) |
 
 Dernier relevé fourni : 5 971 livraisons, 5 971 transactions distinctes, score moyen 0,008,
 latence p50 1,7 ms et 0,0 % de messages dégradés.
@@ -123,12 +123,12 @@ référence de l'étape 0.
 
 | Palier | Début | Fin | Révision mesurée | Révision de comparaison | `tx distinctes` (mesurée / comparaison) | p95 ms (mesurée / comparaison) | Erreurs (mesurée / comparaison) | Alertes (mesurée / comparaison) | Âge du plus ancien message | Décision | Critère invoqué |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Ombre (19/11) | 18:50 | 18:59 | `candidate-1119194145` | `prep-1119180441` | 5 000 / 5 000 | 2,4 / 3,2 | 0,0 % / 0,0 % | 15,4 % / 11,3 % | non mesuré | ombre validée | 4 478 transactions communes, désaccord 7,9 %, écart +4,0 points |
-| 10 % | ~19:00 | ~19:04 | `candidate-1119194145` | `prep-1119180441` | 232 / 2 166 | 2,3 / 3,2 | 0,0 % / 0,0 % | 9,5 % / 8,7 % | non mesuré | avancer | p95 ≤ 4 ms, erreurs ≤ 0,5 %, alertes 5,7–17,0 % |
-| 50 % | ~19:04 | ~19:06 | `candidate-1119194145` | `prep-1119180441` | 681 / 521 | 2,5 / 3,3 | 0,0 % / 0,0 % | 14,1 % / 11,7 % | non mesuré | avancer | p95 ≤ 4 ms, erreurs ≤ 0,5 %, alertes 5,7–17,0 % |
-| 100 % | ~19:06 | ~19:12 | `candidate-1119194145` | `prep` (arrêté) | 3 163 / 0 | 2,6 / — | 0,0 % / — | 13,7 % / — | non mesuré | avancer | p95 ≤ 4 ms, erreurs ≤ 0,5 %, alertes 5,7–17,0 % |
-| Panne (`next-1125145911` à 10 %) | ~14:00:50 | ~14:01:30 | `next-1125145911` | `candidate` | 1 / 1 | 648,1 / 2,3 | 0,0 % / 0,0 % | 100 % / 100 %* | non mesuré | retour arrière | p95 Cloud Run > 20 ms ou p95 app > 5 ms ; 3 timeouts client |
-| Retour (`candidate` à 100 %) | ~14:01:40 | ~14:04:40 | `candidate` | `next` (arrêté) | 68 / 0 | 2,3 / — | 0,0 % / — | 100 %* / — | non mesuré | retour validé | p95 revenu à 2,3 ms |
+| Ombre (19/11) | 18:50 | 18:59 | `candidate-1119194145` | `prep-1119180441` | 5 000 / 5 000 | 2,4 / 3,2 | 0,0 % / 0,0 % | 15,4 % / 11,3 % | 8 s | ombre validée | 4 478 transactions communes, désaccord 7,9 %, écart +4,0 points |
+| 10 % | ~19:00 | ~19:04 | `candidate-1119194145` | `prep-1119180441` | 232 / 2 166 | 2,3 / 3,2 | 0,0 % / 0,0 % | 9,5 % / 8,7 % | 5 s | avancer | p95 ≤ 4 ms, erreurs ≤ 0,5 %, alertes 5,7–17,0 % |
+| 50 % | ~19:04 | ~19:06 | `candidate-1119194145` | `prep-1119180441` | 681 / 521 | 2,5 / 3,3 | 0,0 % / 0,0 % | 14,1 % / 11,7 % | 4 s | avancer | p95 ≤ 4 ms, erreurs ≤ 0,5 %, alertes 5,7–17,0 % |
+| 100 % | ~19:06 | ~19:12 | `candidate-1119194145` | `prep` (arrêté) | 3 163 / 0 | 2,6 / — | 0,0 % / — | 13,7 % / — | 1 s | avancer | p95 ≤ 4 ms, erreurs ≤ 0,5 %, alertes 5,7–17,0 % |
+| Panne (`next-1125145911` à 10 %) | ~14:00:50 | ~14:01:30 | `next-1125145911` | `candidate` | 1 / 1 | 648,1 / 2,3 | 0,0 % / 0,0 % | 100 % / 100 %* | 0 s | retour arrière | p95 Cloud Run > 20 ms ou p95 app > 5 ms ; 3 timeouts client |
+| Retour (`candidate` à 100 %) | ~14:01:40 | ~14:04:40 | `candidate` | `next` (arrêté) | 68 / 0 | 2,3 / — | 0,0 % / — | 100 %* / — | 0 s | retour validé | p95 revenu à 2,3 ms |
 
 Les lignes 10 / 50 / 100 % proviennent des logs réels du 19/11 : la part de la candidate passe de ~10 % (232 messages sur 2 398) à ~50 % (681 sur 1 202) puis 100 % (3 163). Les p95, erreurs et alertes sont mesurés par `measure.py` sur chaque fenêtre.
 
