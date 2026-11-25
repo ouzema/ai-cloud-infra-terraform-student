@@ -1,4 +1,4 @@
-# template.revision = team-really-cool-scorer-next-1120132320 (dernière révision créée) ;
+# template.revision = team-really-cool-scorer-next-1125145911 (dernière révision créée) ;
 # trafic 100 % = team-really-cool-scorer-candidate-1119194145 : le gabarit courant n'est pas la révision qui sert.
 google_cloud_run_v2_service.scorer: Preparing import... [id=projects/advanced-cloud-ai/locations/europe-west1/services/team-really-cool-scorer]
 google_cloud_run_v2_service.scorer: Refreshing state... [id=projects/advanced-cloud-ai/locations/europe-west1/services/team-really-cool-scorer]
@@ -9,11 +9,11 @@ Terraform will perform the following actions:
     resource "google_cloud_run_v2_service" "scorer" {
         annotations             = {}
         client                  = "gcloud"
-        client_version          = "590.0.1"
+        client_version          = "590.0.0"
         conditions              = [
             {
                 execution_reason     = null
-                last_transition_time = "2026-11-25T00:02:38.144822Z"
+                last_transition_time = "2026-11-25T14:03:30.373767Z"
                 message              = null
                 reason               = null
                 revision_reason      = null
@@ -23,7 +23,7 @@ Terraform will perform the following actions:
             },
             {
                 execution_reason     = null
-                last_transition_time = "2026-11-25T00:02:48.310755Z"
+                last_transition_time = "2026-11-25T14:03:41.690339Z"
                 message              = "Updating revision scaling succeeded."
                 reason               = null
                 revision_reason      = "RETIRED"
@@ -44,28 +44,28 @@ Terraform will perform the following actions:
         effective_labels        = {
             "goog-terraform-provisioned" = "true"
         }
-        etag                    = "\"CJzLmNgGEKjJsZAD/cHJvamVjdHMvYWR2YW5jZWQtY2xvdWQtYWkvbG9jYXRpb25zL2V1cm9wZS13ZXN0MS9zZXJ2aWNlcy90ZWFtLXJlYWxseS1jb29sLXNjb3Jlcg\""
+        etag                    = "\"CLLVm9gGENCNwTA/cHJvamVjdHMvYWR2YW5jZWQtY2xvdWQtYWkvbG9jYXRpb25zL2V1cm9wZS13ZXN0MS9zZXJ2aWNlcy90ZWFtLXJlYWxseS1jb29sLXNjb3Jlcg\""
         expire_time             = null
-        generation              = "23"
+        generation              = "27"
         iap_enabled             = false
         id                      = "projects/advanced-cloud-ai/locations/europe-west1/services/team-really-cool-scorer"
         ingress                 = "INGRESS_TRAFFIC_ALL"
         invoker_iam_disabled    = false
         labels                  = {}
         last_modifier           = "<adresse>"
-        latest_created_revision = "projects/advanced-cloud-ai/locations/europe-west1/services/team-really-cool-scorer/revisions/team-really-cool-scorer-next-1120132320"
-        latest_ready_revision   = "projects/advanced-cloud-ai/locations/europe-west1/services/team-really-cool-scorer/revisions/team-really-cool-scorer-next-1120132320"
+        latest_created_revision = "projects/advanced-cloud-ai/locations/europe-west1/services/team-really-cool-scorer/revisions/team-really-cool-scorer-next-1125145911"
+        latest_ready_revision   = "projects/advanced-cloud-ai/locations/europe-west1/services/team-really-cool-scorer/revisions/team-really-cool-scorer-next-1125145911"
         launch_stage            = "GA"
         location                = "europe-west1"
         name                    = "team-really-cool-scorer"
-        observed_generation     = "23"
+        observed_generation     = "27"
         project                 = "advanced-cloud-ai"
         reconciling             = false
         ssh_enabled             = false
         terminal_condition      = [
             {
                 execution_reason     = null
-                last_transition_time = "2026-11-25T00:02:38.165634Z"
+                last_transition_time = "2026-11-25T14:03:30.406683Z"
                 message              = null
                 reason               = null
                 revision_reason      = null
@@ -85,7 +85,7 @@ Terraform will perform the following actions:
             },
         ]
         uid                     = "498b76f5-6c52-4632-b1bb-797ad58c75a1"
-        update_time             = "2026-11-25T00:02:36.839673Z"
+        update_time             = "2026-11-25T14:03:30.101730Z"
         uri                     = "https://team-really-cool-scorer-ueiaychpgq-ew.a.run.app"
         urls                    = [
             "https://team-really-cool-scorer-191726065850.europe-west1.run.app",
@@ -107,7 +107,7 @@ Terraform will perform the following actions:
             health_check_disabled            = false
             labels                           = {}
             max_instance_request_concurrency = 4
-            revision                         = "team-really-cool-scorer-next-1120132320"
+            revision                         = "team-really-cool-scorer-next-1125145911"
             service_account                  = "team-really-cool-scorer@advanced-cloud-ai.iam.gserviceaccount.com"
             session_affinity                 = false
             timeout                          = "300s"

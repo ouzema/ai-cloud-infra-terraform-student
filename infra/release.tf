@@ -83,7 +83,7 @@ resource "google_monitoring_alert_policy" "release" {
 
       # Seuil : 50 ms de p95 par révision. La référence saine est ~10 ms côté Cloud Run
       # (3,1 ms applicatif) ; 50 ms laisse passer un cold start isolé et déclenche sur
-      # une régression comme celle de `next` (564 ms).
+      # une régression comme celle de `next` (648 ms).
       threshold_value = 50
 
       # Durée : 60 s au-dessus du seuil. Une minute suffit à voir la régression sans

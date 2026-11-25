@@ -21,7 +21,7 @@ measurements and the release incident.
 | 7 | Session 3 | `/pubsub` deployed; 2 522 messages in 1 h; 100 test messages at 20 msg/s; dead-letter `42ab0a…` after 5 attempts |
 | 8 | Session 4 sources | parquet 0.78/1.5 ms; BigQuery 244.7/414.2 ms; Firestore 17.7/128.7 ms; BQ and Firestore scores identical |
 | 9 | Session 6 Terraform | `release.tf` alert on p95 latency; `scorer.tf` imported read-only; `plan.txt` 1 import / 0 change |
-| 10 | Session 6 incident | `next` (`FEATURE_READER=direct`) p95 564.1 ms vs candidate 3.1 ms; rolled back; alert corrected |
+| 10 | Session 6 incident | `next-1125145911` (`FEATURE_READER=direct`) p95 648.1 ms vs candidate 2.3 ms, 3 client timeouts; rolled back; alert corrected |
 | 11 | Session 6 report | `mesures.md`, `post-mortem.md`, `checklist.md` filled with real evidence |
 | 12 | Reports | Session 2, 3, 4 reports filled with measured values |
 
@@ -279,7 +279,7 @@ are `3263319564977208`, `2947552228922773` and `0553287702820053`.
 - `docs/seance-6/plan.txt`: `1 to import, 0 to add, 0 to change, 0 to destroy`, creator/last_modifier
   masked.
 - The plan confirms the handout's warning: `template.revision` is
-  `team-really-cool-scorer-next-1120132320` (latest created), while 100 % of traffic is on
+  `team-really-cool-scorer-next-1125145911` (latest created), while 100 % of traffic is on
   `team-really-cool-scorer-candidate-1119194145`. The first two lines of `plan.txt` record it.
 - `infra/release.tf`: shadow subscription `count = shadow_tag == "" ? 0 : 1`; alert policy applied
   and enabled.
@@ -293,21 +293,24 @@ The alert was initially written for `td6_failed` (5 failures/min). The incident 
 
 ## 11. Session 6 — the incident
 
-The `next` revision was still present with `FEATURE_READER=direct` (candidate uses `snapshot`). It was
-tagged `next`, given 10 % of traffic, and exercised with 100 `/pubsub` calls at 10/s.
+The teacher's command created `team-really-cool-scorer-next-1125145911` with
+`FEATURE_READER=direct` (candidate uses `snapshot`). It was tagged `next`, given 10 % of traffic, and
+exercised with 100 `/pubsub` calls at 10/s.
 
 | Revision | n | p50 | p95 | Errors | Degraded |
 | --- | --- | --- | --- | --- | --- |
-| `candidate` | 92 | 2.0 ms | 3.1 ms | 0 % | 0 % |
-| `next` | 9 | 371.6 ms | 564.1 ms | 0 % | 0 % |
+| `candidate` | 68 | 1.8 ms | 2.3 ms | 0 % | 0 % |
+| `next-1125145911` | 9 | 426.1 ms | 648.1 ms | 0 % (3 client timeouts) | 0 % |
 
-- First `next` log: 23:59:54, `latency_ms` 638.13, `features_ms` 606.15.
-- Detection: 00:00:20 via `measure.py`.
-- Rollback: 00:00:30, `candidate=100`; `next` tag removed.
-- Last `next` log: 00:00:09; after rollback, candidate p95 3.0 ms.
+- First `next` log: 14:01:00, `latency_ms` 681.99, `features_ms` 635.29.
+- Detection: ~14:01:30 via `measure.py`; p95 648.1 ms vs 2.3 ms.
+- Rollback: ~14:01:40, `candidate=100`; `next` tag removed.
+- Last `next` log: 14:01:13; after rollback, candidate p95 2.3 ms.
+- The 3 timeouts happened before the service logged anything (cold start of `next`); `measure.py`
+  sees 0 % application errors, which is exactly why the `td6_failed` alert was wrong.
 
-Cause: `FEATURE_READER=direct` queries BigQuery per transaction (606 ms of features) instead of
-reading the precomputed snapshot (1.46 ms). The service is correct but slow; an error-based alert
+Cause: `FEATURE_READER=direct` queries BigQuery per transaction (635 ms of features) instead of
+reading the precomputed snapshot (1.79 ms). The service is correct but slow; an error-based alert
 would never see it. The post-mortem is `docs/seance-6/post-mortem.md`; the measures and the answers
 are in `docs/seance-6/mesures.md`.
 
@@ -383,8 +386,8 @@ The readiness checklist is filled with the truth: **Validated** no (validation d
   `message_id`/`publish_time` columns are therefore empty. This is documented in the report.
 - The Session 2 metrics were measured on the `td4`/parquet revision on 24 November, not on the
   original Session 2 date. The values are real and the protocol is the same.
-- The Session 6 incident times are bracketed by logs; the exact split time (~23:59:48) is
-  reconstructed from the first `next` log at 23:59:54.
+- The Session 6 incident times are bracketed by logs; the exact split time (~14:00:50) is
+  reconstructed from the first `next` log at 14:01:00.
 - The `next` test used the same transaction 100 times, so `tx distinctes` is 1 and the alert rate is
   not representative; the p95 and errors are valid.
 - The Terraform plan was run with `-refresh=false`; a refreshed plan may show drift on the live

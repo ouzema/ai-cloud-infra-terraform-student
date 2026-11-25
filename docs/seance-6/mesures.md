@@ -69,7 +69,7 @@ borne de repli retenue : 5,7 % à 17,0 % ; heure : 17:30 UTC. Écart d'alertes m
 
 L'alerte appliquée dans `infra/release.tf` surveille la p95 Cloud Run > 50 ms pendant 60 s, par
 révision. Le seuil est au-dessus du seuil de retour arrière (20 ms) pour absorber un cold start isolé ;
-il déclenche sur la régression de `next` (564 ms), que l'ancienne alerte sur `td6_failed` n'aurait pas
+il déclenche sur la régression de `next` (648 ms), que l'ancienne alerte sur `td6_failed` n'aurait pas
 vue.
 
 Durée d'observation par palier : 5 min après la fin de la commande de changement de trafic ; mesurer
@@ -126,8 +126,8 @@ référence de l'étape 0.
 | 10 % | ... | ... | ... | ... | ... / ... | ... / ... | ... / ... | ... / ... | ... | ... | ... |
 | 50 % | ... | ... | ... | ... | ... / ... | ... / ... | ... / ... | ... / ... | ... | ... | ... |
 | 100 % | ... | ... | ... | ... | ... / ... | ... / ... | ... / ... | ... / ... | ... | ... | ... |
-| Panne (`next` à 10 %) | ~23:59:48 | ~00:00:20 | `next` | `candidate` | 1 / 1 | 564,1 / 3,1 | 0,0 % / 0,0 % | 100 % / 100 %* | non mesuré | retour arrière | p95 Cloud Run > 20 ms ou p95 app > 5 ms |
-| Retour (`candidate` à 100 %) | ~00:00:30 | ~00:03:30 | `candidate` | `next` (arrêté) | 37 / 0 | 3,0 / — | 0,0 % / — | 100 %* / — | non mesuré | retour validé | p95 revenu à 3,0 ms |
+| Panne (`next-1125145911` à 10 %) | ~14:00:50 | ~14:01:30 | `next-1125145911` | `candidate` | 1 / 1 | 648,1 / 2,3 | 0,0 % / 0,0 % | 100 % / 100 %* | non mesuré | retour arrière | p95 Cloud Run > 20 ms ou p95 app > 5 ms ; 3 timeouts client |
+| Retour (`candidate` à 100 %) | ~14:01:40 | ~14:04:40 | `candidate` | `next` (arrêté) | 68 / 0 | 2,3 / — | 0,0 % / — | 100 %* / — | non mesuré | retour validé | p95 revenu à 2,3 ms |
 
 \* La même transaction de test (`7c318…`) a été envoyée 100 fois : `tx distinctes` vaut 1 et le taux
 d'alerte de 100 % n'est pas représentatif. Les p95, les erreurs et les dégradés sont valides.
@@ -135,10 +135,11 @@ d'alerte de 100 % n'est pas représentatif. Les p95, les erreurs et les dégrad�
 En ombre : non mesuré dans cette reprise (l'ombre n'a pas été branchée). La validation donne 7,58 % de
 désaccord sur août.
 
-Panne : passage à 10 % vers 23:59:48 ; premier log `next` à 23:59:54 (638 ms) ; détection à 00:00:20
-sur `measure.py` (p95 564,1 ms contre 3,1 ms pour `candidate`) ; délai ≈ 30 s ; signal : latence p95
-(valeur 564,1 ms, borne de retour arrière > 20 ms Cloud Run / > 5 ms applicatif). Retour à 00:00:30 ;
-dernier log `next` à 00:00:09, aucun après.
+Panne : passage à 10 % vers 14:00:50 ; premier log `next-1125145911` à 14:01:00 (681,99 ms,
+features 635,29) ; détection à ~14:01:30 sur `measure.py` (p95 648,1 ms contre 2,3 ms pour
+`candidate`) ; délai ≈ 40 s ; signal : latence p95 (valeur 648,1 ms, borne de retour arrière
+> 20 ms Cloud Run / > 5 ms applicatif) et 3 timeouts client (démarrage à froid). Retour vers
+14:01:40 ; dernier log `next` à 14:01:13, aucun après.
 
 Alias `champion` du registre : déjà sur la version 2 (`default`, `challenger`, `champion`), déplacé
 lors de la séance. `promote.sh` n'a donc rien changé au trafic, ce qui est normal : l'alias désigne la
@@ -169,7 +170,7 @@ version du modèle, pas la répartition des révisions.
    au début. Le test d'incident a envoyé une seule transaction distincte 100 fois ; il valide les
    latences, pas le taux d'alerte.
 2. Signal le plus proche du seuil de retour arrière, et à quel palier : la latence p95 de `next`, au
-   palier de panne à 10 % (564,1 ms contre une borne de 20 ms Cloud Run / 5 ms applicatif).
+   palier de panne à 10 % (648,1 ms contre une borne de 20 ms Cloud Run / 5 ms applicatif, plus 3 timeouts client).
 3. Effet de `promote.sh` sur le trafic, et rôle de l'alias du registre : aucun effet sur le trafic ;
    l'alias `champion` désigne la version du modèle (ici la version 2), pas la répartition des
    révisions Cloud Run. Il permet à une nouvelle révision de charger la bonne version.
@@ -183,5 +184,5 @@ version du modèle, pas la répartition des révisions.
    seule ; le taux d'erreur — et donc l'alerte `td6_failed` — ne l'aurait jamais vue, puisque la
    révision répondait 204 avec un score valide.
 3. Transactions traitées par la révision `next` avant la détection ; ce qu'elle en aurait traité à
-   100 % : 9 livraisons (1 transaction distincte) avant la détection ; à 100 %, elle aurait traité
+   100 % : 9 livraisons (1 transaction distincte, 3 timeouts client) avant la détection ; à 100 %, elle aurait traité
    les 100 requêtes du test.

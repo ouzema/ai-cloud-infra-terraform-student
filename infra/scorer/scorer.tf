@@ -5,7 +5,7 @@
 resource "google_cloud_run_v2_service" "scorer" {
   annotations          = {}
   client               = "gcloud"
-  client_version       = "590.0.1"
+  client_version       = "590.0.0"
   custom_audiences     = []
   default_uri_disabled = false
   deletion_policy      = "DELETE"
@@ -35,7 +35,7 @@ resource "google_cloud_run_v2_service" "scorer" {
     health_check_disabled            = false
     labels                           = {}
     max_instance_request_concurrency = 4
-    revision                         = "team-really-cool-scorer-next-1120132320"
+    revision                         = "team-really-cool-scorer-next-1125145911"
     service_account                  = "team-really-cool-scorer@advanced-cloud-ai.iam.gserviceaccount.com"
     session_affinity                 = false
     timeout                          = "300s"
