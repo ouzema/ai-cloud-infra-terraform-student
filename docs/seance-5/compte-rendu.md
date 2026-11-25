@@ -173,9 +173,31 @@ niveau gratuit). Le custom job Vertex AI n'a pas été facturé puisqu'il n'a ja
    chargement des données ; FSDP/ZeRO devient nécessaire dès que le modèle complet ne tient plus
    sur un seul processus.
 
-   Réponse individuelle — Oussema ARIBI : *à écrire et signer par Oussema.*
+   Réponse individuelle — Oussema ARIBI : dans DDP, chaque processus porte une réplique complète du
+   modèle : paramètres, gradients et état de l'optimiseur sont dupliqués, seul le batch est réparti.
+   Après la rétropropagation, un all-reduce en anneau agrège les gradients avant la mise à jour, ce
+   qui garde les répliques identiques à chaque pas. Le gain reste sous le nombre de processus : cette
+   agrégation coûte de la communication à chaque itération, le chargement des données et le démarrage
+   ne sont pas parallélisés, et tous attendent le plus lent. Notre recherche Optuna montre la même
+   mécanique sans all-reduce : 3,79× à 4 workers et 6,49× à 8 (efficacité 95 % puis 81 %), parce que
+   `sum_fit_seconds` ne baisse pas (1 309 → 1 399 s), que 39 à 65 s de part fixe restent par exécution
+   et que le worker le plus chargé impose la fin ; ce ne sont pas des mesures DDP, dont les débits
+   n'ont pas été relevés. FSDP ou ZeRO s'impose quand paramètres + gradients + états d'optimiseur ne
+   tiennent plus dans un processus : ils sont répartis entre les processus, moins de mémoire par
+   processus contre plus de communication.
 
-   Réponse individuelle — Elisa CHEN : *à écrire et signer par Elisa.*
+   Réponse individuelle — Elisa CHEN : DDP est du parallélisme de données : le modèle, ses gradients
+   et l'état de l'optimiseur (les deux moments d'Adam) sont répliqués sur chaque processus, seules les
+   données sont découpées. L'all-reduce des gradients à chaque pas garde les répliques cohérentes,
+   mais ce rendez-vous consomme de la bande passante et fait attendre le processus le plus lent ; avec
+   le chargement des batches et le lancement des processus, on s'attend à ce que deux processus ne
+   doublent pas le débit (les débits de la démonstration n'ont pas été relevés). Le coût mémoire, lui,
+   ne baisse pas : en fp32 avec Adam, chaque paramètre coûte 4 octets de poids, 4 de gradient et 8 de
+   moments, soit 16 octets, donc un modèle de 1 milliard de paramètres demande ~16 Go par processus
+   avant les activations, quel que soit le nombre de processus. FSDP ou ZeRO découpent paramètres,
+   gradients et états d'optimiseur entre les N processus, ce qui divise cette mémoire par environ N ;
+   on échange de la mémoire contre plus de communication, puisqu'il faut rassembler les paramètres
+   avant chaque couche.
 
 **Note étape 4 :** les deux débits (échantillons/s) et les AP de validation à 1 et 2 processus n'ont
 pas été notés pendant la démonstration de l'enseignant ; ils ne figurent ni dans le dépôt ni dans les
