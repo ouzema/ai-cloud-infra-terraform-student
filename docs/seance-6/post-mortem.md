@@ -1,5 +1,7 @@
 # Post-mortem séance 6 — team-really-cool
 
+**Qui a fait quoi.** Oussema ARIBI : détection, diagnostic et retour arrière ; Elisa CHEN : chronologie et mesures avant/après ; Yann MEUROU : actions et règle d'alerte dans `infra/release.tf`. Aucune faute individuelle n'est recherchée : la cause est un changement de configuration non testé en ombre.
+
 **Résumé en une phrase.** La révision `next-1125145911`, déployée avec `FEATURE_READER=direct`, a lu
 les features par une requête BigQuery par transaction : la p95 est passée de 2,3 ms à 648 ms, avec
 3 timeouts client ; le retour à `candidate` a restauré la p95 à 2,3 ms.

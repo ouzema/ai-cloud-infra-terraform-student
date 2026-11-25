@@ -1,5 +1,7 @@
 # Compte rendu séance 4 — team-really-cool
 
+**Qui a fait quoi.** Elisa CHEN : historisation (A), index HNSW (D, partie individuelle) et conclusion ; Oussema ARIBI : requêtes `infra/sql/` et `check.sql` (B) ; Yann MEUROU : mesures des trois sources de features (C).
+
 Dataset : `team_really_cool`, région `europe-west1`. Sources : `fraudfinder.tx_seed` (passé),
 `team_really_cool.tx_history` (flux), `fraudfinder.ref_customer_daily` et
 `fraudfinder.ref_terminal_daily` (référence).
@@ -19,6 +21,11 @@ Pour débloquer la partie B, le fichier local `data/replay.parquet` (1–3 octob
 chargé directement dans `tx_history` via une table temporaire, puis les cinq colonnes métier ont été
 insérées. C'est un contournement documenté : la table n'a donc pas les colonnes `message_id`,
 `publish_time` ni `attributes`, et `messages` vaut 0.
+
+**Compétence 1 non démontrée.** L'abonnement BigQuery `team-really-cool-tx-history` existe
+(`infra/bigquery.tf`) mais n'a écrit aucune ligne : la preuve « `tx_history` rempli par
+l'abonnement » manque. Pour l'obtenir, publier quelques transactions sur le topic de l'abonnement et
+relever `COUNT(DISTINCT message_id) > 0` dans `tx_history`.
 
 Le filtre sur `2026-10-01` ne découpe rien : toutes les lignes sont postérieures à cette date. Le
 filtre d'un jour (`2026-10-03`) montre le prunage de partition : 5,0 Mo au lieu de 12,6 Mo.
@@ -49,6 +56,22 @@ SQL : [`infra/sql/customer_daily.sql`](../../infra/sql/customer_daily.sql),
 `terminal_daily` en contient 119 640. La ligne du 1er octobre du client de référence n'existe dans
 aucun fichier parquet : elle vient bien du flux.
 
+**B.2 — Où la règle « une transaction du 2 octobre ne lit que les jours jusqu'au 1er » est-elle
+appliquée ?** Au moment de la **lecture**, pas dans la table. `customer_daily` contient bien une
+ligne pour chaque jour, y compris le jour même (voir l'en-tête de `infra/sql/customer_daily.sql`) ;
+c'est le service qui, pour une transaction du jour J, ne somme que les jours `day < J`. Si le
+compteur du jour même était lu, la feature contiendrait des transactions **postérieures** à celle
+qu'on score (celles de 9 h à 23 h 59 le 2 octobre) : c'est une fuite temporelle. À l'entraînement, le
+modèle verrait ainsi une partie du futur et paraîtrait meilleur qu'il ne l'est ; en production, ce
+futur n'existe pas encore au moment du paiement, donc la feature n'aurait pas la même distribution
+et la performance chuterait. `check.sql` renvoie 0 et 0 : nos compteurs sont identiques à ceux de
+référence, sans doublon (déduplication sur `TX_ID` dans `flux`).
+
+**B.3 — `n_fraud` vaut 0 le 1er octobre : erreur ?** Non. Les lignes du flux n'ont pas de label
+(`TX_FRAUD` est `NULL`), donc `COUNTIF(TX_FRAUD = 1)` vaut 0. Dans un vrai système, une fraude
+n'est connue qu'après la réclamation du client ou l'enquête, souvent plusieurs jours plus tard : le
+délai de 7 jours évite de lire un taux de fraude encore incomplet, donc faussement bas.
+
 ## C. Trois sources de features
 
 | Source | p50 `features_ms` | p99 `features_ms` | Score de la transaction de référence |
@@ -73,6 +96,8 @@ curl -s -X POST $URL/predict -H "Authorization: Bearer $TOKEN" \
 ```
 
 ## D. Justificatifs KYC (extension)
+
+*Partie individuelle — Elisa CHEN.*
 
 Service `team-really-cool-vectors` (Qdrant), 49 394 documents, 384 dimensions. Les deux index ont été
 reconstruits et mesurés sur 300 requêtes, 10 voisins.

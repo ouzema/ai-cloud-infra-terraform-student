@@ -1,5 +1,7 @@
 # Compte rendu séance 5 — team-really-cool
 
+**Qui a fait quoi.** Yann MEUROU : job d'entraînement reproductible (`infra/job.tf`, `metadata.json`) et recherche à 1, 4 et 8 workers ; Elisa CHEN : coût des recherches et du run 12 mois ; Oussema ARIBI : run 12 mois, porte d'entrée et décision au registre.
+
 | Mesure | Valeur |
 | --- | --- |
 | Étape 0 : lignes relues dans `MANIFEST.json` (`train-sample`, `valid`, `test`) ; version et alias du modèle en place | 611 548, 311 624, 301 545 ; version 1, alias `champion` |
@@ -166,10 +168,14 @@ niveau gratuit). Le custom job Vertex AI n'a pas été facturé puisqu'il n'a ja
    processus, ou pour entraîner un modèle beaucoup plus grand : on échange alors plus de
    communication contre de la mémoire.
 
-   Réponse individuelle — Yann : le second processus apporte du débit de calcul parallèle, pas de
+   Réponse individuelle — Yann MEUROU : le second processus apporte du débit de calcul parallèle, pas de
    la mémoire. Le débit ne double pas à cause de l'`all-reduce`, de la synchronisation et du
    chargement des données ; FSDP/ZeRO devient nécessaire dès que le modèle complet ne tient plus
    sur un seul processus.
+
+   Réponse individuelle — Oussema ARIBI : *à écrire et signer par Oussema.*
+
+   Réponse individuelle — Elisa CHEN : *à écrire et signer par Elisa.*
 
 **Note étape 4 :** les deux débits (échantillons/s) et les AP de validation à 1 et 2 processus n'ont
 pas été notés pendant la démonstration de l'enseignant ; ils ne figurent ni dans le dépôt ni dans les

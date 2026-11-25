@@ -1,5 +1,13 @@
 # Rapport séance 2 — team-really-cool
 
+**Qui a fait quoi.** Oussema ARIBI : image `linux/amd64` et `infra/main.tf` (compte `team-really-cool-run`, droits, service, droit d'appel) ; Yann MEUROU : essais 403/200 et `terraform plan` après `apply` ; Elisa CHEN : mesures de latence, cold start et instances.
+
+**Repli à signaler.** Notre image `team-really-cool-fraud-api:td3` (construite depuis
+`td2-fraud-api-albertschool`, `linux/amd64`) a été déployée en séance 2–3. Les mesures ci-dessous
+ont été prises plus tard sur l'image de référence `ref-fraud-api:td4`, déployée pour la séance 4
+(lecture des features depuis trois sources). La compétence « observer un service déployé » repose
+donc sur l'image de référence : plafonnée au niveau 2.
+
 Service : `team-really-cool-fraud-api`, Cloud Run, `europe-west1`.
 Date du relevé : 2026-11-24 23:52 UTC (fenêtre de 10 min).
 Image mesurée : `ref-fraud-api:td4`, source `parquet`, révision
@@ -54,6 +62,31 @@ done
 Les timings serveur de la réponse donnent `features` p50 0,60 ms, `predict` p50 0,68 ms et
 `handler` p50 1,31 ms. Le reste de la latence client (25,9 ms p50) est le réseau, la sérialisation et
 l'attente de la réponse.
+
+## Service privé : 403 sans jeton, 200 avec
+
+`allUsers` n'apparaît nulle part dans `infra/` ; seuls `var.invokers` et `team-really-cool-push`
+ont `roles/run.invoker`. `team-really-cool-run` n'a que `roles/storage.objectViewer` sur le bucket
+des modèles et `roles/logging.logWriter`.
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' "$URL/health"                                        # attendu 403
+curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $TOKEN" "$URL/health"       # attendu 200
+```
+
+```text
+SORTIE À COLLER (relevé du jour)
+```
+
+## `terraform plan` après `apply`
+
+```bash
+cd infra && terraform plan -detailed-exitcode
+```
+
+```text
+SORTIE À COLLER (relevé du jour)
+```
 
 ## Lecture
 

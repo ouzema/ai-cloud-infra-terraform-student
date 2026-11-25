@@ -1,13 +1,15 @@
 # Mesures séance 6 — team-really-cool
 
+**Qui a fait quoi.** Elisa CHEN : critères, paliers 10/50/100 % et décisions ; Yann MEUROU : validation et ombre ; Oussema ARIBI : diagnostic de la panne `next`, retour arrière et post-mortem.
+
 ## Valeurs de référence (étape 0)
 
 | Mesure | Valeur |
 | --- | --- |
 | Heure du relevé ; fenêtre | 2026-11-19, fenêtre de 10 min (relevé de séance) |
-| Révision en service (tag `champion`) | `team-really-cool-scorer-prep-1119180441` (à confirmer dans la table du trafic) |
+| Révision en service (tag `champion`) | `team-really-cool-scorer-prep-1119180441` (non vérifiée dans la table du trafic) |
 | Latence p95 applicative (`p95 ms` de `measure.py`) | 3,4 ms |
-| Latence p95 Cloud Run (`request_latencies`, tableau de bord) | ≈ 10 ms sur la capture ; à confirmer sur une fenêtre de 10 min |
+| Latence p95 Cloud Run (`request_latencies`, tableau de bord) | ≈ 10 ms, lu sur une capture (pas de relevé sur une fenêtre de 10 min) |
 | Taux d'erreur (`erreurs`) | 0,0 % |
 | Taux d'alerte (`alertes`) | 11,3 % |
 | Âge du plus ancien message non acquitté (tableau de bord) | 8 s max sur 18:30–19:30 (métrique `oldest_unacked_message_age`) |
@@ -17,10 +19,13 @@ latence p50 1,7 ms et 0,0 % de messages dégradés.
 
 ## Critères (étape 1)
 
-Heure à laquelle les critères sont figés : **2026-11-19 à 17:30 UTC**. Horodatage reconstitué à
-partir des révisions : la révision de base `team-really-cool-scorer-prep-1119180441` a été créée à
-18:04 UTC, donc avant le premier déploiement `candidate`. À ajuster si le journal de séance donne une
-heure exacte.
+Heure à laquelle les critères sont figés : **non prouvée avant le premier déploiement — compétence 1
+à « non ».** Le 19/11, `mesures.md` (commits `fe6472f` 15:21 UTC et `b5414b3` 16:51 UTC) gardait
+encore les `...` du modèle : les seuils ont été discutés en séance mais pas écrits ni poussés. Leur
+première trace écrite est le commit `e0cfabf` du **2026-11-20 à 12:03 UTC**, après la création de la
+révision `candidate` du 19/11. Une heure « reconstituée » serait contredite par l'historique Git,
+donc nous ne l'affirmons pas. Ce qui manque : un commit horodaté des critères avant le premier
+`release.sh`. Les décisions de palier ci-dessous appliquent ces critères tels qu'écrits.
 
 Objectif de service cloud proposé : absorber le flux de 10 transactions/s avec une latence p95 Cloud
 Run ≤ 20 ms, un taux d'erreur applicatif ≤ 1 % et un âge du plus ancien message non acquitté < 60 s.
@@ -34,7 +39,7 @@ références et leurs seuils sont suivis séparément.
 | Signal | Référence | Seuil d'avancement | Seuil de retour arrière | Source |
 | --- | --- | --- | --- | --- |
 | Latence p95 applicative (TD) | 3,4 ms | ≤ 4 ms | > 5 ms | `measure.py`, `p95 ms` |
-| Latence p95 Cloud Run (contrôle supplémentaire) | ≈ 10 ms, à confirmer sur une fenêtre comparable | ≤ 15 ms | > 20 ms | tableau de bord, `request_latencies`, par révision |
+| Latence p95 Cloud Run (contrôle supplémentaire) | ≈ 10 ms (capture) | ≤ 15 ms | > 20 ms | tableau de bord, `request_latencies`, par révision |
 | Taux d'erreur | 0,0 % | ≤ 0,5 % | > 1 % | `measure.py`, `erreurs` |
 | Taux d'alerte | 11,3 % | entre 5,7 % et 17,0 % (grille de repli) | < 5,7 % ou > 17,0 % | `measure.py`, `alertes` |
 | Âge du plus ancien message | à relever, en secondes | < 30 s | ≥ 60 s | tableau de bord |
@@ -53,6 +58,8 @@ Justification des seuils :
 - L'âge du plus ancien message mesure le retard du flux. Nous choisissons moins de 30 s pour avancer
   et 60 s comme limite de retour arrière, conformément à la grille de repli de l'énoncé. La référence
   saine reste à vérifier dans le tableau de bord.
+- **Repli signalé :** les bornes du taux d'alerte et de l'âge du plus ancien message viennent de la
+  grille de repli de l'énoncé ; ces critères sont donc plafonnés au niveau 2.
 - Le taux d'alerte peut changer avec le modèle. La borne retenue est celle de la grille de repli
   (0,5× à 1,5× la référence), soit 5,7 % à 17,0 %. La validation de la séance 5 donne 13,43 % pour le
   candidat contre 13,83 % pour le champion, soit un écart de −0,4 point : un écart de cet ordre n'est
@@ -106,8 +113,8 @@ gcloud run services update-traffic team-really-cool-scorer --project advanced-cl
 | Segment le plus faible ; son écart et son `ic95` | activité client 7 j ≥ 20 ; 0,0212 [0,0159 ; 0,0268] |
 | Segments non concluants | aucun : les six segments sont `concluant: true` |
 | `rejeu` : désaccord, taux d'alerte champion et candidat | 0,0758 ; 0,1383 ; 0,1343 |
-| Révision candidate ; version du modèle | à confirmer dans la table du trafic ; run `20261118T200052Z54cc32`, version 2 du registre |
-| Verdict | favorable : contrat ok, AP +0,0381 avec un IC qui exclut 0, tous segments concluants ; à confirmer en ombre |
+| Révision candidate ; version du modèle | non relevée dans la table du trafic ; run `20261118T200052Z54cc32`, version 2 du registre |
+| Verdict | favorable : contrat ok, AP +0,0381 avec un IC qui exclut 0, tous segments concluants ; confirmé en ombre le 19/11 (4 478 transactions communes, désaccord 7,9 %, alertes +4,0 points, p95 2,4 vs 3,2 ms, 0 % d'erreurs) |
 
 Avertissement lu dans `validation.txt` : août 2026 a servi à choisir les hyperparamètres du challenger,
 donc les écarts sont optimistes pour lui. Seul le jeu de test, lu par `train.gate`, tranche.
