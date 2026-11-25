@@ -91,7 +91,13 @@ gcloud logging read 'resource.labels.service_name="team-really-cool-fraud-api" A
   --freshness 1d --format 'value(jsonPayload.tx_id)' | sort | uniq -d | wc -l
 ```
 
-Résultat : `À RELEVER`. Pour distinguer les deux cas : une **nouvelle livraison** garde le même
+Résultat (relevé du 25/11, 50 000 lignes `scored` du 16/11 au 25/11, limite de lecture atteinte) :
+49 300 `tx_id` distincts ; **un seul** `tx_id` en double, `7c318ce1…`, présent 701 fois, toujours avec
+`delivery_attempt` = 1 : c'est la transaction de test republiée par nos essais de charge (seconde
+publication), pas une relivraison. 508 lignes ont `delivery_attempt` > 1, mais leurs `tx_id` n'y
+figurent qu'une fois : les tentatives précédentes avaient échoué (404 avant `/pubsub`, ou
+démarrage à froid) sans écrire de ligne `scored`. Nous n'observons donc aucun doublon dû à une
+relivraison sur cette fenêtre. Pour distinguer les deux cas : une **nouvelle livraison** garde le même
 `message_id` et a un `delivery_attempt` > 1 ; une **seconde publication** a un `message_id`
 différent pour le même `tx_id`, avec `delivery_attempt` = 1. Limite : notre ligne `scored` contient
 `tx_id` et `delivery_attempt` mais pas `message_id` (il est dans l'enveloppe, `message.messageId`) ;

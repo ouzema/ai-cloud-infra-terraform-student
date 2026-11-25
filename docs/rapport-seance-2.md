@@ -75,18 +75,37 @@ curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $TOKEN" "$URL
 ```
 
 ```text
-SORTIE À COLLER (relevé du jour)
+2026-11-25T22:09:11Z
+URL=https://team-really-cool-fraud-api-ueiaychpgq-ew.a.run.app
+sans jeton : 403
+avec jeton : 200
 ```
+
+`gcloud run services get-iam-policy` sur le service : `roles/run.invoker` pour
+`serviceAccount:team-really-cool-push@…` et `user:ymeurou@albertschool.com` uniquement ; aucun
+`allUsers`.
 
 ## `terraform plan` après `apply`
 
 ```bash
-cd infra && terraform plan -detailed-exitcode
+cd infra && terraform plan -detailed-exitcode \
+  -target=google_service_account.run -target=google_storage_bucket_iam_member.models_reader \
+  -target=google_project_iam_member.log_writer -target=google_cloud_run_v2_service.api \
+  -target=google_cloud_run_v2_service_iam_member.invokers   # + les 5 ressources de pubsub.tf
 ```
 
 ```text
-SORTIE À COLLER (relevé du jour)
+No changes. Your infrastructure matches the configuration.
+exit=0   (relevé du 2026-11-25 vers 22:15 UTC)
 ```
+
+Le premier `plan` complet du jour montrait deux écarts, corrigés sans `apply` :
+`client`/`client_version` sur le service, écrits par `gcloud` à chaque déploiement continu (ajoutés
+à `ignore_changes` dans `infra/main.tf`), et un `terraform.tfvars` local qui ne listait pas le même
+appelant que celui de l'`apply` (`ymeurou@`). Le `plan` complet propose encore de **créer** 9
+ressources des séances 4 et 5 (job `train`, compte `train` et ses droits, service `vectors`) : elles
+ont été détruites en fin de séance et n'existent plus (`gcloud run jobs list`,
+`gcloud iam service-accounts list`). Rien à modifier ni à détruire.
 
 ## Lecture
 

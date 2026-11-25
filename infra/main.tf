@@ -118,8 +118,9 @@ resource "google_cloud_run_v2_service" "api" {
   depends_on = [google_storage_bucket_iam_member.models_reader]
 
   lifecycle {
-    # l'image est choisie par le déploiement continu, pas par Terraform
-    ignore_changes = [template[0].containers[0].image]
+    # l'image est choisie par le déploiement continu, pas par Terraform ;
+    # client/client_version sont écrits par gcloud à chaque déploiement continu
+    ignore_changes = [template[0].containers[0].image, client, client_version]
   }
 }
 
