@@ -22,10 +22,38 @@ chargé directement dans `tx_history` via une table temporaire, puis les cinq co
 insérées. C'est un contournement documenté : la table n'a donc pas les colonnes `message_id`,
 `publish_time` ni `attributes`, et `messages` vaut 0.
 
-**Compétence 1 non démontrée.** L'abonnement BigQuery `team-really-cool-tx-history` existe
-(`infra/bigquery.tf`) mais n'a écrit aucune ligne : la preuve « `tx_history` rempli par
-l'abonnement » manque. Pour l'obtenir, publier quelques transactions sur le topic de l'abonnement et
-relever `COUNT(DISTINCT message_id) > 0` dans `tx_history`.
+**Preuve de l'abonnement (25/11/2026).** Pour ne pas publier sur `ff-replay`, partagé par toutes les
+équipes, l'abonnement `team-really-cool-tx-history` a été rattaché à un topic de l'équipe,
+`team-really-cool-tx-history-proof` (`infra/history_proof.tf`, `history_topic` dans
+`terraform.tfvars`) :
+
+```text
+$ terraform apply -target=google_pubsub_topic.history_proof -target=google_pubsub_subscription.tx_history
+google_pubsub_subscription.tx_history: Destroying... [id=projects/advanced-cloud-ai/subscriptions/team-really-cool-tx-history]
+google_pubsub_topic.history_proof: Creation complete after 3s
+google_pubsub_subscription.tx_history: Creation complete after 6s
+Apply complete! Resources: 2 added, 0 changed, 1 destroyed.
+```
+
+20 transactions de test publiées avec `gcloud pubsub topics publish` (`TX_ID` `td4-proof-01` à
+`td4-proof-20`, attribut `source=td4-proof`), sans une ligne de code : Pub/Sub les a écrites seul
+dans la table.
+
+```text
+SELECT COUNT(*) lignes, COUNT(DISTINCT TX_ID), COUNT(DISTINCT message_id), ANY_VALUE(subscription_name), MIN(publish_time), MAX(publish_time)
+FROM team_really_cool.tx_history WHERE subscription_name IS NOT NULL
+| lignes | tx_distinctes | messages | abonnement                  | premier             | dernier             |
+| 20     | 20            | 20       | team-really-cool-tx-history | 2026-11-25 22:53:49 | 2026-11-25 22:53:56 |
+
+| TX_ID        | TX_AMOUNT | message_id        | publish_time        | attributes             |
+| td4-proof-01 | 11.5      | 20361496139896339 | 2026-11-25 22:53:49 | {"source":"td4-proof"} |
+| td4-proof-02 | 12.5      | 23484343186886082 | 2026-11-25 22:53:50 | {"source":"td4-proof"} |
+```
+
+Table entière après la preuve : 301 023 lignes, 301 023 `TX_ID` distincts, 20 messages. Les
+301 003 lignes du contournement restent sans métadonnées ; les chiffres B et C ci-dessous ont été
+calculés avant la preuve et ne contiennent pas ces 20 lignes. Limite : 20 messages à faible débit ;
+le comportement de l'abonnement sous le palier du rejeu (1 000 msg/s) n'est pas mesuré.
 
 Le filtre sur `2026-10-01` ne découpe rien : toutes les lignes sont postérieures à cette date. Le
 filtre d'un jour (`2026-10-03`) montre le prunage de partition : 5,0 Mo au lieu de 12,6 Mo.
