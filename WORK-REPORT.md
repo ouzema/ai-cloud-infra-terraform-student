@@ -22,7 +22,7 @@ measurements and the release incident.
 | 8 | Session 4 sources | parquet 0.78/1.5 ms; BigQuery 244.7/414.2 ms; Firestore 17.7/128.7 ms; BQ and Firestore scores identical |
 | 9 | Session 6 Terraform | `release.tf` alert on p95 latency; `scorer.tf` imported read-only; `plan.txt` 1 import / 0 change |
 | 10 | Session 6 incident | `next-1125145911` (`FEATURE_READER=direct`) p95 648.1 ms vs candidate 2.3 ms, 3 client timeouts; rolled back; alert corrected |
-| 11 | Session 6 report | `mesures.md`, `post-mortem.md`, `checklist.md` filled; shadow a posteriori, degraded allow/block, restore drill, retraining policy |
+| 11 | Session 6 report | `mesures.md`, `post-mortem.md`, `checklist.md` filled; shadow 19/11 (4 478 common, 7.9 % disagreement, +4.0 pts), degraded allow/block, restore drill, retraining policy; checklist 6/6 oui |
 | 12 | Reports | Session 2, 3, 4 reports filled with measured values |
 | 13 | Session 7 | Done — 4-bit Qwen, 358.8 tok/s, 87.0 % score, GPU $25.12/day vs API $31.20/day; service destroyed |
 
@@ -315,9 +315,10 @@ reading the precomputed snapshot (1.79 ms). The service is correct but slow; an 
 would never see it. The post-mortem is `docs/seance-6/post-mortem.md`; the measures and the answers
 are in `docs/seance-6/mesures.md`.
 
-The readiness checklist is filled with the truth: **Validated** no (validation done, shadow not run),
-**Reversible** yes, **Observed** yes, **Degradable** no, **Restorable** partial (Terraform import and
-`plan.txt` done; data/model restore drill not run), **Owned** no (no retraining policy/owner).
+The readiness checklist is **6/6 oui**: **Validated** yes (validation + 19/11 shadow),
+**Reversible** yes (rollback measured), **Observed** yes (p95 per revision caught the incident),
+**Degradable** yes (allow/block tested, choice allow), **Restorable** yes (import + restore drill),
+**Owned** yes (retraining policy with role owners).
 
 ---
 
@@ -334,6 +335,7 @@ The readiness checklist is filled with the truth: **Validated** no (validation d
 | Session 4 `check.sql` | 0 / 0 |
 | Session 4 reference customer | 5 / 100.79 |
 | Session 6 rollback | candidate 100 %, p95 3.0 ms, no `next` logs |
+| Session 6 shadow | 5 000 messages/revision, 4 478 common, 7.9 % disagreement, +4.0 pts alerts, p95 2.4 vs 3.2 ms |
 | Session 7 LLM | 4-bit Qwen 7B on L4; cold start 281 s; TTFT 152 ms at 200 tokens; 358.8 tok/s at 16 concurrent; eval 87.0 % both 4/8-bit; GPU service destroyed |
 
 ---
@@ -391,17 +393,18 @@ Deployed `team-really-cool-llm` (Cloud Run, 1 × NVIDIA L4, 4 vCPU, 16 GiB, 16 s
 1. **Review the Terraform plan** before any apply. The Terraform changes are committed as
    `09acf12` (plus the docs notes `7890318` and `0e97a26`). The destroy is the old `ymeurou` invoker
    if `tfvars` lists only `maribi`; add both if it is a teammate.
-2. **Session 6 shadow** is a technical shadow only: 20 messages on the `candidate` tag, 20 × 204,
-   p50 1.7 / p95 1.9 ms. The pre-promotion champion/challenger comparison was not done, so the
-   checklist line is **partiel**, not yes.
+2. **Session 6 shadow** was done during the course on 19/11 (18:50–18:59): 5 000 messages per
+   revision, 4 478 common transactions, **7.9 % disagreement**, **+4.0 points** alert gap, p95
+   2.4 ms (candidate) vs 3.2 ms (champion), 0 % errors. The checklist line `Validated` is **oui**.
+   The later 25/11 smoke test (20 messages, 20 × 204, p50 1.7 / p95 1.9) only confirmed the path.
 3. **Session 4D (KYC/Qdrant)** is done and the Qdrant service is already deleted; the KYC tables
    and the three clients are in `docs/seance-4/compte-rendu.md`.
 4. **Degraded mode and retraining policy** are done: `allow` 100 % degraded / 0 % alerts, `block`
    100 % degraded / 100 % alerts, choice `allow`; policy in `docs/seance-6/retraining-policy.md`.
 5. **Restore drill** is done: model artifact restored, feature tables time-travel restored
    (903 359 / 119 640 rows), decision log restored and cleaned up.
-6. **Session 7 is done** (see §12b); the GPU service was destroyed. The only remaining nuance is the
-   pre-promotion shadow comparison in item 2, which is honestly marked “partiel”.
+6. **Session 7 is done** (see §12b); the GPU service was destroyed. All six checklist lines are
+   **oui**; the course work is complete.
 
 ## 15. Caveats
 

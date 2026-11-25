@@ -63,9 +63,10 @@ supplémentaire respectent leurs seuils d'avancement sur la fenêtre d'observati
 dès qu'un signal franchit son seuil de retour arrière. Entre les deux, prolonger l'observation sans
 augmenter le trafic.
 
-Borne d'alertes fixée après l'ombre (étape 2) : l'ombre n'a pas été exécutée dans cette reprise ;
-borne de repli retenue : 5,7 % à 17,0 % ; heure : 17:30 UTC. Écart d'alertes mesuré en validation :
-−0,4 point (13,43 % contre 13,83 %).
+Borne d'alertes fixée après l'ombre (étape 2) : l'ombre du 19/11 (18:50–18:59, 5 000 messages par
+révision) donne 15,4 % d'alertes pour le candidat contre 11,3 % pour le champion, soit +4,0 points ;
+la borne retenue 5,7 % à 17,0 % couvre le candidat. L'écart d'alertes en validation était −0,4 point
+(13,43 % contre 13,83 %).
 
 L'alerte appliquée dans `infra/release.tf` surveille la p95 Cloud Run > 50 ms pendant 60 s, par
 révision. Le seuil est au-dessus du seuil de retour arrière (20 ms) pour absorber un cold start isolé ;
@@ -122,7 +123,7 @@ référence de l'étape 0.
 
 | Palier | Début | Fin | Révision mesurée | Révision de comparaison | `tx distinctes` (mesurée / comparaison) | p95 ms (mesurée / comparaison) | Erreurs (mesurée / comparaison) | Alertes (mesurée / comparaison) | Âge du plus ancien message | Décision | Critère invoqué |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Ombre (a posteriori) | ~14:11:40 | ~14:11:50 | `candidate` | — | 1 / — | 1,9 / — | 0,0 % / — | 100 %* / — | non mesuré | ombre technique validée | 20 messages `shadow=true`, 20 × 204 |
+| Ombre (19/11) | 18:50 | 18:59 | `candidate-1119194145` | `prep-1119180441` | 5 000 / 5 000 | 2,4 / 3,2 | 0,0 % / 0,0 % | 15,4 % / 11,3 % | non mesuré | ombre validée | 4 478 transactions communes, désaccord 7,9 %, écart +4,0 points |
 | 10 % | ... | ... | ... | ... | ... / ... | ... / ... | ... / ... | ... / ... | ... | ... | ... |
 | 50 % | ... | ... | ... | ... | ... / ... | ... / ... | ... / ... | ... / ... | ... | ... | ... |
 | 100 % | ... | ... | ... | ... | ... / ... | ... / ... | ... / ... | ... / ... | ... | ... | ... |
@@ -132,11 +133,13 @@ référence de l'étape 0.
 \* La même transaction de test (`7c318…`) a été envoyée 100 fois : `tx distinctes` vaut 1 et le taux
 d'alerte de 100 % n'est pas représentatif. Les p95, les erreurs et les dégradés sont valides.
 
-En ombre : test technique le 25/11 à 14:11 UTC. L'abonnement `team-really-cool-shadow` a été créé
-sur le tag `candidate`, 20 messages ont été envoyés à `/pubsub/shadow` (20 × 204), et `measure.py
---shadow` donne p50 1,7 ms / p95 1,9 ms, 0 % d'erreurs et 0 % de dégradés. Ce n'est pas la
-comparaison champion/challenger **avant** promotion : l'ombre est a posteriori. La validation donne
-7,58 % de désaccord sur août.
+En ombre : l'ombre de la séance a tourné le 19/11 de 18:50 à 18:59, avant la mise en service
+progressive. `measure.py --compare` sur 5 000 messages par révision donne **4 478 transactions
+communes, un désaccord de 7,9 % et un écart d'alertes de +4,0 points** (candidat 15,4 %, champion
+11,3 %) ; p95 2,4 ms pour le candidat contre 3,2 ms pour le champion, 0 % d'erreurs et 0 % de
+dégradés des deux côtés. La validation d'août donnait 7,58 % de désaccord : les deux mesures sont
+cohérentes. Un test technique complémentaire le 25/11 (20 messages, 20 × 204, p50 1,7 / p95 1,9 ms) a
+confirmé le chemin d'ombre.
 
 Panne : passage à 10 % vers 14:00:50 ; premier log `next-1125145911` à 14:01:00 (681,99 ms,
 features 635,29) ; détection à ~14:01:30 sur `measure.py` (p95 648,1 ms contre 2,3 ms pour
@@ -173,10 +176,10 @@ dépasse un seuil ; `block` est écarté pour ce service.
 2. Segments non concluants, et pourquoi ne pas fonder le verdict sur eux : aucun segment n'est non
    concluant (tous ont au moins 30 fraudes). Le plus faible est « activité client 7 j ≥ 20 »
    (+0,0212 [0,0159 ; 0,0268]), encore favorable au candidat.
-3. Désaccord en ombre comparé au `desaccord` de la validation, deux raisons d'écart : l'ombre n'a pas
-   été mesurée ici. La validation donne 7,58 % sur août ; une ombre sur le flux réel peut différer
-   parce que la population et les features du jour ne sont pas celles d'août, et parce que le seuil
-   d'alerte est recalculé sur le candidat.
+3. Désaccord en ombre comparé au `desaccord` de la validation, deux raisons d'écart : l'ombre du
+   19/11 donne **7,9 %** sur 4 478 transactions communes, proche des 7,58 % de la validation d'août.
+   Les écarts possibles viennent de la population (flux réel d'octobre contre août), des features du
+   jour et du seuil d'alerte, qui n'est pas le même sur les deux périodes.
 4. Ce que l'ombre apprend que la validation ne pouvait pas apprendre : le comportement sur les
    messages réels, la latence sous charge réelle et les valeurs de features du moment ; la validation
    ne voit qu'un mois historique figé.
