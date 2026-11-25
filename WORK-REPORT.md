@@ -22,8 +22,9 @@ measurements and the release incident.
 | 8 | Session 4 sources | parquet 0.78/1.5 ms; BigQuery 244.7/414.2 ms; Firestore 17.7/128.7 ms; BQ and Firestore scores identical |
 | 9 | Session 6 Terraform | `release.tf` alert on p95 latency; `scorer.tf` imported read-only; `plan.txt` 1 import / 0 change |
 | 10 | Session 6 incident | `next-1125145911` (`FEATURE_READER=direct`) p95 648.1 ms vs candidate 2.3 ms, 3 client timeouts; rolled back; alert corrected |
-| 11 | Session 6 report | `mesures.md`, `post-mortem.md`, `checklist.md` filled with real evidence |
+| 11 | Session 6 report | `mesures.md`, `post-mortem.md`, `checklist.md` filled; shadow a posteriori, degraded allow/block, restore drill, retraining policy |
 | 12 | Reports | Session 2, 3, 4 reports filled with measured values |
+| 13 | Session 7 | Not started — new GPU/LLM lab |
 
 ---
 
@@ -368,17 +369,20 @@ The readiness checklist is filled with the truth: **Validated** no (validation d
 
 ## 14. What remains
 
-1. **Review the `14 add / 1 change / 1 destroy` plan** before any apply. The Terraform changes are
-   committed as `09acf12` (plus the docs note `7890318`). The destroy is the old `ymeurou` invoker if `tfvars` lists only `maribi`;
-   add both if it is a teammate.
-2. **Session 6 shadow** was not run. The validation and the live incident are measured, but the
-   "ombre" line of the checklist is still a no. `release.tf` is ready; `-var shadow_tag=candidate`
-   creates the subscription for a test, and re-applying without it removes it.
-3. **Session 4D (KYC/Qdrant)** is done. The Qdrant service is still running; destroy it with the
-   targeted `terraform destroy` if you do not need it, to stop its cost.
-4. **Degraded mode and retraining policy** are not tested. The checklist says no and what is missing.
-5. **Restore drill**: model version 2, feature tables and decision log have not been restored from
-   backups; the Terraform import proves the service can be reconstructed, not the data.
+1. **Review the Terraform plan** before any apply. The Terraform changes are committed as
+   `09acf12` (plus the docs notes `7890318` and `0e97a26`). The destroy is the old `ymeurou` invoker
+   if `tfvars` lists only `maribi`; add both if it is a teammate.
+2. **Session 6 shadow** is a technical shadow only: 20 messages on the `candidate` tag, 20 × 204,
+   p50 1.7 / p95 1.9 ms. The pre-promotion champion/challenger comparison was not done, so the
+   checklist line is **partiel**, not yes.
+3. **Session 4D (KYC/Qdrant)** is done and the Qdrant service is already deleted; the KYC tables
+   and the three clients are in `docs/seance-4/compte-rendu.md`.
+4. **Degraded mode and retraining policy** are done: `allow` 100 % degraded / 0 % alerts, `block`
+   100 % degraded / 100 % alerts, choice `allow`; policy in `docs/seance-6/retraining-policy.md`.
+5. **Restore drill** is done: model artifact restored, feature tables time-travel restored
+   (903 359 / 119 640 rows), decision log restored and cleaned up.
+6. **Session 7** is new work: read `docs/seance-7.md` and follow the GPU/LLM lab. It is not a gap in
+   the Session 2–6 hand-in.
 
 ## 15. Caveats
 

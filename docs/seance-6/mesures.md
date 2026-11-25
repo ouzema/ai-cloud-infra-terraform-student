@@ -122,7 +122,7 @@ référence de l'étape 0.
 
 | Palier | Début | Fin | Révision mesurée | Révision de comparaison | `tx distinctes` (mesurée / comparaison) | p95 ms (mesurée / comparaison) | Erreurs (mesurée / comparaison) | Alertes (mesurée / comparaison) | Âge du plus ancien message | Décision | Critère invoqué |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Ombre (0 %) | ... | ... | ... | ... | ... / ... | ... / ... | ... / ... | ... / ... | ... | ... | ... |
+| Ombre (a posteriori) | ~14:11:40 | ~14:11:50 | `candidate` | — | 1 / — | 1,9 / — | 0,0 % / — | 100 %* / — | non mesuré | ombre technique validée | 20 messages `shadow=true`, 20 × 204 |
 | 10 % | ... | ... | ... | ... | ... / ... | ... / ... | ... / ... | ... / ... | ... | ... | ... |
 | 50 % | ... | ... | ... | ... | ... / ... | ... / ... | ... / ... | ... / ... | ... | ... | ... |
 | 100 % | ... | ... | ... | ... | ... / ... | ... / ... | ... / ... | ... / ... | ... | ... | ... |
@@ -132,8 +132,11 @@ référence de l'étape 0.
 \* La même transaction de test (`7c318…`) a été envoyée 100 fois : `tx distinctes` vaut 1 et le taux
 d'alerte de 100 % n'est pas représentatif. Les p95, les erreurs et les dégradés sont valides.
 
-En ombre : non mesuré dans cette reprise (l'ombre n'a pas été branchée). La validation donne 7,58 % de
-désaccord sur août.
+En ombre : test technique le 25/11 à 14:11 UTC. L'abonnement `team-really-cool-shadow` a été créé
+sur le tag `candidate`, 20 messages ont été envoyés à `/pubsub/shadow` (20 × 204), et `measure.py
+--shadow` donne p50 1,7 ms / p95 1,9 ms, 0 % d'erreurs et 0 % de dégradés. Ce n'est pas la
+comparaison champion/challenger **avant** promotion : l'ombre est a posteriori. La validation donne
+7,58 % de désaccord sur août.
 
 Panne : passage à 10 % vers 14:00:50 ; premier log `next-1125145911` à 14:01:00 (681,99 ms,
 features 635,29) ; détection à ~14:01:30 sur `measure.py` (p95 648,1 ms contre 2,3 ms pour
@@ -144,6 +147,21 @@ features 635,29) ; détection à ~14:01:30 sur `measure.py` (p95 648,1 ms contre
 Alias `champion` du registre : déjà sur la version 2 (`default`, `challenger`, `champion`), déplacé
 lors de la séance. `promote.sh` n'a donc rien changé au trafic, ce qui est normal : l'alias désigne la
 version du modèle, pas la répartition des révisions.
+
+## Mode dégradé (extension)
+
+Test synthétique de la panne de lecture des features : `FEATURE_READER=direct`,
+`BQ_DATASET=does_not_exist`, sur le tag `degrade`, 10 messages `/pubsub/shadow` par politique.
+
+| Politique | Messages (envoyés / journalisés) | Dégradés | Alertes | Erreurs | p50 / p95 |
+| --- | --- | --- | --- | --- | --- |
+| `allow` | 10 / 10 | 100,0 % | 0,0 % | 0,0 % | 277,0 / 586,9 ms |
+| `block` | 10 / 4 | 100,0 % | 100,0 % | 0,0 % | 542,3 / 623,6 ms |
+
+En `allow`, le service continue de scorer avec des features dégradées sans flood d'alertes (0 %) ;
+en `block`, il marque 100 % des transactions en alerte, ce qui coûte un flot de faux positifs aux
+analystes. Choix retenu : **`allow`**, avec la métrique `dégradés` surveillée et une alerte si elle
+dépasse un seuil ; `block` est écarté pour ce service.
 
 ## Réponses aux questions
 
